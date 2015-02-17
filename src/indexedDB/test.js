@@ -100,7 +100,8 @@ function mod(isPutWhenGet) {
             count++;
             var value = cursor.value;
             value.field3 += 1;
-            store.put(value);
+            cursor.update(value);
+            //store.put(value);
             cursor.continue();
         };
 
