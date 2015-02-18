@@ -8,6 +8,8 @@ var DB_NAME = 'library19';
 var STORE_NAME = 'matrix10kAnd5';
 var DATA_COUNT = 100000;
 var FIELD_COUNT = 10;
+var msgDom;
+var logDom;
 
 function openDBAsync() {
     var promise = new Promise(function (resolve, reject) {
@@ -108,9 +110,16 @@ function mod(isPutWhenGet) {
         // get the data from cursor and put the at the end
         var toModify = [];
         var put = function () {
+            var okCount = 0;
+            var putSuccess = function (e) {
+                if (++okCount === toModify.length) {
+                    clocker.record('real finished');
+                }
+                msgDom.value = okCount;
+            };
             var modify = function (item) {
                 item.field3 += 1;
-                store.put(item);
+                store.put(item).onsuccess = putSuccess;
             };
             toModify.forEach(modify);
             db.close();
@@ -146,6 +155,22 @@ function Clocker(name) {
     };
 }
 
-function log (msg) {
+var globalLogText = '';
+function log(msg) {
+    globalLogText = msg + '\n' + globalLogText;
     console.log(msg);
+    logDom.value = globalLogText;
 }
+
+function load() {
+    msgDom = document.getElementById('msg');
+    logDom = document.getElementById('log');
+}
+
+(function () {
+    if (document.all) {
+        window.attachEvent('onload', load);
+    } else {
+        window.addEventListener('load', load, false);
+    }
+})();
