@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <script src="../../dep/esl.js"></script>
+    </head>
+    <body>
+        <textarea style="width:100%; height:200px" id= 'log'></textarea>
+        <script>
+        var globalLogText = '';
+        var logDom = document.getElementById('log');
+        function log(msg) {
+            globalLogText = globalLogText + '\n' + msg;
+            console.log(msg);
+            logDom.value = globalLogText;
+        }
+        require(['./GBKEncoder'],
+            function (GBKEncoder) {
+                var str = '关门打狗';
+                var gbkArray = GBKEncoder.encode(str);
+                var buffer = new Uint8Array(gbkArray);
+                log('array: ' + gbkArray.join(','));
+                // use html5 decoder to decode
+                var decoder = new TextDecoder('gbk');
+                var decodeStr = decoder.decode(buffer);
+                log('decode str: ' + decodeStr);
+            }
+        )
+    </script>
+    </body>
+</html>
