@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <script src="../../dep/esl.js"></script>
+    </head>
+    <body>
+        <textarea style="width:100%; height:200px" id= 'log'></textarea>
+        <script>
+            var globalLogText = '';
+            var logDom = document.getElementById('log');
+
+            function log(msg) {
+                globalLogText = globalLogText + '\n' + msg;
+                console.log(msg);
+                logDom.value = globalLogText;
+            }
+            require(['./trietree'],
+                function (Trietree) {
+                    var testWords = ['我爱北京天安门', '我爱北京', '我爱北京天安门', '我爱北京的天安门', '我爱北京天安门吗', '', '我'];
+                    var trietree = new Trietree();
+                    testWords.forEach(function (word, index) {
+                        trietree.add(word, index);
+                    });
+                    testWords.forEach(function (word, index) {
+                        log('indexs of ' + word + ' is ' + trietree.get(word))
+                    });
+                }
+            );
+        </script>
+    </body>
+</html>
