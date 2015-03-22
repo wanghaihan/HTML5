@@ -23,7 +23,10 @@
                         trietree.add(word, index);
                     });
                     testWords.forEach(function (word, index) {
-                        log('indexs of ' + word + ' is ' + trietree.get(word))
+                        log('indexs of ' + word + ' is ' + trietree.get(word));
+                    });
+                    testWords.forEach(function (word, index) {
+                        log('remove ' + word + ': ' + trietree.remove(word, index));
                     });
                 }
             );
