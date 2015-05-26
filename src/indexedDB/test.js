@@ -4,7 +4,7 @@
  * @author Haihan Wang(wanghaihan@baidu.com)
  */
 /* global console,Promise*/
-var DB_NAME = 'library19';
+var DB_NAME = 'library31';
 var STORE_NAME = 'matrix10kAnd5';
 var DATA_COUNT = 100000;
 var FIELD_COUNT = 10;
@@ -13,7 +13,7 @@ var logDom;
 
 function openDBAsync() {
     var promise = new Promise(function (resolve, reject) {
-        var request = indexedDB.open(DB_NAME, 1);
+        var request = indexedDB.open(DB_NAME, 5);
         request.onupgradeneeded = function (event) {
             var db = event.target.result;
             log('update from ' + event.oldVersion + ' to ' + event.newVersion);
@@ -60,21 +60,24 @@ function generateData() {
             randomData.push(data);
         }
         var index = 0;
-        var batchCount = DATA_COUNT / 2;
+        var batchCount = DATA_COUNT;
         var addClocker = new Clocker('Add' + batchCount);
-        var putClocker = new Clocker('Put' + batchCount);
+        // var putClocker = new Clocker('Put' + batchCount);
 
+        transaction.oncomplete = function (evt) {
+            addClocker.record('Add real finished');
+        };
         // alternate to avoid first time influence
         addClocker.start();
         for (i = 0; i < batchCount; i++) {
             store.add(randomData[index++]);
         }
         addClocker.record();
-        putClocker.start();
-        for (i = 0; i < batchCount; i++) {
-            store.put(randomData[index++]);
-        }
-        putClocker.record();
+        // putClocker.start();
+        // for (i = 0; i < batchCount; i++) {
+        //     store.put(randomData[index++]);
+        // }
+        // putClocker.record();
     });
 }
 
@@ -110,16 +113,9 @@ function mod(isPutWhenGet) {
         // get the data from cursor and put the at the end
         var toModify = [];
         var put = function () {
-            var okCount = 0;
-            var putSuccess = function (e) {
-                if (++okCount === toModify.length) {
-                    clocker.record('real finished');
-                }
-                msgDom.value = okCount;
-            };
             var modify = function (item) {
                 item.field3 += 1;
-                store.put(item).onsuccess = putSuccess;
+                store.put(item);
             };
             toModify.forEach(modify);
             db.close();
@@ -136,8 +132,10 @@ function mod(isPutWhenGet) {
             toModify.push(cursor.value);
             cursor.continue();
         };
-
         req.onsuccess = isPutWhenGet ? putWhenGet : get;
+        transaction.oncomplete = function (evt) {
+            clocker.record('real finished');
+        };
     });
 }
 
@@ -156,6 +154,7 @@ function Clocker(name) {
 }
 
 var globalLogText = '';
+
 function log(msg) {
     globalLogText = msg + '\n' + globalLogText;
     console.log(msg);
