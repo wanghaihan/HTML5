@@ -4,7 +4,7 @@
  * @author Haihan Wang(wanghaihan@baidu.com)
  */
 /* global console,Promise*/
-var DB_NAME = 'library31';
+var DB_NAME = 'library32';
 var STORE_NAME = 'matrix10kAnd5';
 var DATA_COUNT = 100000;
 var FIELD_COUNT = 10;
