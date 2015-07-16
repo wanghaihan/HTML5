@@ -173,3 +173,82 @@ function load() {
         window.addEventListener('load', load, false);
     }
 })();
+
+
+/**
+ * 例： 输入 '"abc",de,ae,"111,222"' 返回 ['abc', 'de', 'ae', '111,222']
+ */
+function getRealArr(str) {
+    if (str.indexOf('\t') > -1) {
+        return str.split('\t');
+    }
+    var tmp = str.split(',');
+    var arr = [];
+    var inbox = false;
+    var tmpstr = '';
+    var inner = '';
+    for (var n = 0; n < tmp.length; n++) {
+        inner = tmp[n];
+        if (inbox) {
+            if (inner.charAt(inner.length - 1) === '"') {
+                tmpstr = tmpstr + ',' + inner.substr(0, inner.length - 1);
+                inbox = false;
+                arr.push(tmpstr);
+                tmpstr = '';
+            } else {
+                tmpstr = tmpstr + inner;
+            }
+        } else {
+            if (inner.charAt(0) === '"') {
+                if (inner.charAt(inner.length - 1) === '"') {
+                    arr.push(inner.substr(1, inner.length - 2));
+                } else {
+                    tmpstr = inner.substr(1, inner.length - 1);
+                    inbox = true;
+                }
+            } else {
+                arr.push(inner);
+            }
+        }
+    }
+    return arr;
+}
+
+
+// 将关键字、创意的planid和unitid转译
+exports.fixedKeywordAndIdea = function (arr, plan, unit, level, noGroup) {
+    var unGroupCount = 0;
+    var newPlan = {};
+    var newUnit = {};
+    for (var n = 0; n < arr.length; n++) {
+        var item = arr[n];
+        var unitkey = item.planid + item.unitid;
+        if ($.trim(item.planid) === '' || $.trim(item.unitid) === '') {
+            // 未分组
+            unGroupCount++;
+            item.planid = 0;
+            item.unitid = 0;
+        } else if (unit[unitkey] === undefined) {
+            // 需要新建单元，不可能存在计划没有，单元有的情况
+            noGroup[level].push(arr.splice(n, 1)[0]);
+            n = n - 1;
+            if (!newUnit[item.planid + item.unitid]) {
+                noGroup.unit.push(createOneDefaultUnit(item.unitid, item.planid, item.bid));
+                newUnit[item.planid + item.unitid] = 1;
+            }
+            if (!plan[item.planid] && !newPlan[item.planid]) {
+                noGroup.plan.push(createOneDefaultPlan(item.planid));
+                newPlan[item.planid] = 1;
+            }
+        } else {
+            item.planid = plan[item.planid] ? plan[item.planid] : 0;
+            item.unitid = unit[unitkey] ? unit[unitkey] : 0;
+            // 处理仅移动计划特殊情况
+            if (item.planid && onlyMobilePlanIds[item.planid]) {
+                // ...
+            }
+        }
+    }
+    unGroupCount && addUnGroupInfo(unGroupCount, level);
+    return arr;
+};

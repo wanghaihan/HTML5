@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8" />
+    <title></title>
+    <!--<meta name="viewport" content="width=888, initial-scale=1"/>-->
+    <meta nam`e="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #box100 {
+            width: 100px;
+            height: 100px;
+            background-color: gold;
+        }
+        #boxFull {
+            width: 100%;
+            background-color: blue;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="box100">100px</div>
+<div id="boxFull"></div>
+<script>
+    document.getElementById('boxFull').innerHTML =
+            'clientWidth: ' + document.documentElement.clientWidth
+            +'<br/> window.innerWidth: ' + window.innerWidth
+            +'<br/> window.devicePixelRatio: ' + window.devicePixelRatio;
+</script>
+</body>
+</html>
+
+
